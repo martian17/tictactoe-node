@@ -65,12 +65,12 @@ class Board{
                 let y = move.match(/^[a-zA-Z]+/);
                 let x = move.match(/[0-9]+$/);
                 if(!x || !y){
-                    await rl.question("Please make a valid move");
+                    await rl.question("Please make a valid move ([Enter] to continue)");
                     continue;
                 }
                 const res = this.move(x[0],y[0].toLowerCase());
                 if(res !== "success"){
-                    await rl.question(res);
+                    await rl.question(res+" ([Enter] to continue)");
                     continue;
                 }
                 break;
