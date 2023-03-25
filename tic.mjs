@@ -74,7 +74,7 @@ class Board{
     }
     draw(){
         const {board,n} = this;
-        let res = "     "+newarr(n).map((_,i)=>`${formatNumber(i+1)} `.slice(0,2)).join("")+"\n";
+        let res = "    "+newarr(n).map((_,i)=>` ${formatNumber(i+1)}`.slice(-2)).join("")+"\n";
         //let res = repeat("_",n*2+4)+"\n";
         res += board.map((r,i)=>(" "+numToAlpha(i+1).toUpperCase()).slice(-2)+" | "+r.map(n=>charmap[n]).join(" ")+" |").join("\n")+"\n";
         //res += "\n   "+repeat("_",n*2+4);
