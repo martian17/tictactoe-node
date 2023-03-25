@@ -45,7 +45,7 @@ class Board{
         //y is alphabet
         x = code(x)-49;
         y = code(y)-97;
-        if(x < 0 || y < 0 || x > n || y > n){
+        if(x < 0 || y < 0 || x >= n || y >= n){
             return "Input is out of range";
         }
         if(board[y][x] !== 0){
