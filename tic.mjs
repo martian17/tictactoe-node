@@ -22,6 +22,47 @@ const code = (c)=>{
     return c.charCodeAt(0);
 };
 
+
+//bijective base 26 conversion
+const alphaToNum = function(alph){
+    return [...alph].map(c=>code(c)-97+1).reverse().map((v,i)=>v*(26**i)).reduce((a,b)=>a+b);
+};
+
+const c26map = Object.fromEntries([..."0123456789abcdefghijklmnop"].map((c,i)=>[c,i]));
+
+const numToAlpha = function(n){
+    let digits = [...n.toString(26)].map(c=>c26map[c]-1).reverse();
+    const res = [];
+    for(let i = 0; i < digits.length; i++){
+        let n = digits[i];
+        if(n >= 0){
+            res.push(char(n+97));
+            continue;
+        }
+        if(i === digits.length-1){
+            break;
+        }
+        res.push(char(97+26+n));
+        digits[i+1]--;
+    }
+    return res.reverse().join("");
+};
+
+
+const formatNumber = function(num){
+    const numstr = num+"";
+    if(numstr.length === 1){
+        return numstr;
+    }
+    let res = "";
+    for(let i = 0; i < numstr.length-1; i++){
+        res += "⁰¹²³⁴⁵⁶⁷⁸⁹"[parseInt(numstr[i])];
+    }
+    res += numstr[numstr.length-1];
+    return res;
+}
+
+
 const charmap = ["_", "\u001b[34;1mO\u001b[0m", "\u001b[31;1mX\u001b[0m"];
 const nextTurn = [0,2,1];
 
@@ -33,9 +74,9 @@ class Board{
     }
     draw(){
         const {board,n} = this;
-        let res = "     "+newarr(n).map((_,i)=>`${i+1} `).join("")+"\n";
+        let res = "     "+newarr(n).map((_,i)=>`${formatNumber(i+1)} `.slice(0,2)).join("")+"\n";
         //let res = repeat("_",n*2+4)+"\n";
-        res += board.map((r,i)=>" "+char(i+65)+" | "+r.map(n=>charmap[n]).join(" ")+" |").join("\n")+"\n";
+        res += board.map((r,i)=>(" "+numToAlpha(i+1).toUpperCase()).slice(-2)+" | "+r.map(n=>charmap[n]).join(" ")+" |").join("\n")+"\n";
         //res += "\n   "+repeat("_",n*2+4);
         console.log(res);
     }
@@ -43,8 +84,8 @@ class Board{
         const {n,board} = this;
         //x is number
         //y is alphabet
-        x = code(x)-49;
-        y = code(y)-97;
+        x = parseInt(x)-1;
+        y = alphaToNum(y.toLowerCase())-1;
         if(x < 0 || y < 0 || x >= n || y >= n){
             return "Input is out of range";
         }
@@ -68,7 +109,7 @@ class Board{
                     await rl.question("Please make a valid move ([Enter] to continue)");
                     continue;
                 }
-                const res = this.move(x[0],y[0].toLowerCase());
+                const res = this.move(x[0],y[0]);
                 if(res !== "success"){
                     await rl.question(res+" ([Enter] to continue)");
                     continue;
@@ -140,7 +181,7 @@ class Board{
 
 const main = async function(){
     while(true){
-        const n = await rl.question(`Which size would you like to play? (1-9): `);
+        const n = await rl.question(`Which size would you like to play? (input a number bigger than 0): `);
         const board = new Board(parseInt(n));
         await board.start();
         const again = await rl.question(`Would you like to play again? [y/N]: `);
